@@ -27,7 +27,7 @@
 # https://mikrotik.com/products/matrix
 #
 PLATFORM="${PLATFORM:-linux/arm64}"
-TAILSCALE_VERSION=1.96.3
+TAILSCALE_VERSION=1.98.8
 VERSION=0.1.40
 
 # Set other script values to be platform-specific
@@ -72,6 +72,9 @@ rm -f "${FILENAME}"
 if [ ! -d ./tailscale/.git ]
 then
     git -c advice.detachedHead=false clone https://github.com/tailscale/tailscale.git --branch v$TAILSCALE_VERSION
+else
+    git -C ./tailscale/ fetch origin v$TAILSCALE_VERSION && \
+    git -C ./tailscale/ -c advice.detachedHead=false checkout v$TAILSCALE_VERSION
 fi
 
 TS_USE_TOOLCHAIN="Y"
