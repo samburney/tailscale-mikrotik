@@ -2,3 +2,4 @@
 tailscale/
 build-multi.sh
 tailscale.tar
+tailscale-*.tar
