@@ -68,6 +68,32 @@ if [[ -n "${RUNNING_SCRIPT}" && -f "${RUNNING_SCRIPT}" ]]; then
        bash "${RUNNING_SCRIPT}" || exit $?
 fi
 
+# Prepare to start FRR
+echo Starting FRR...
+
+## Add tailscale table to VRF
+/sbin/ip link add tailscale type vrf table 52
+/sbin/ip link set dev tailscale up
+
+# Masquerade to other Tailscale destinations
+/usr/local/bin/iptables -t nat -A POSTROUTING -o tailscale0 -d 100.64.0.0/10 -j MASQUERADE
+
+## Copy default config if it doesn't exist
+if [ ! -f /etc/frr/daemons ] ; then
+  cp /usr/lib/frr/daemons /etc/frr/
+fi
+if [ ! -f /etc/frr/vtysh.conf ] ; then
+  cp /usr/lib/frr/vtysh.conf /etc/frr/
+fi
+
+## Create directories and set permissions
+mkdir /var/run/frr
+chown -R :frr /var/run/frr /etc/frr
+chmod -R g+w /var/run/frr /etc/frr
+
+## Start FRR
+/usr/lib/frr/watchfrr zebra ${FRR_DAEMONS} staticd &
+
 # Start SSH
 /usr/sbin/sshd -D
 

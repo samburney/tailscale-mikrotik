@@ -33,7 +33,7 @@ VERSION=0.1.40
 # Set other script values to be platform-specific
 HOST_PLATFORM=$(docker version -f '{{.Server.Os}}/{{.Server.Arch}}')
 PLATFORM_COMPAT=$(echo "$PLATFORM" | sed -E 's/[^-0-9a-z]/-/gI; s/-+/-/g')
-FILENAME="tailscale-${TAILSCALE_VERSION}-${PLATFORM_COMPAT}.tar"
+FILENAME="tailscale-${TAILSCALE_VERSION}-frr-${PLATFORM_COMPAT}.tar"
 
 # Determine if a cross-platform builder is required
 if [ "$PLATFORM" = "$HOST_PLATFORM" ]; then
@@ -89,6 +89,6 @@ docker buildx build \
   --build-arg VERSION_GIT_HASH=$VERSION_GIT_HASH \
   --platform $PLATFORM \
   $BUILDER_FLAG \
-  --load -t ghcr.io/fluent-networks/tailscale-mikrotik:$VERSION-$TAILSCALE_VERSION .
+  --load -t ghcr.io/samburney/tailscale-mikrotik-frr:$VERSION-$TAILSCALE_VERSION .
 
-skopeo copy docker-daemon:ghcr.io/fluent-networks/tailscale-mikrotik:$VERSION-$TAILSCALE_VERSION docker-archive:"$FILENAME"
+skopeo copy docker-daemon:ghcr.io/samburney/tailscale-mikrotik-frr:$VERSION-$TAILSCALE_VERSION docker-archive:"$FILENAME"

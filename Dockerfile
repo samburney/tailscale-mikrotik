@@ -60,7 +60,7 @@ RUN upx /go/bin/tailscale && upx /go/bin/tailscaled
 
 FROM alpine:3.22
 
-RUN apk add --no-cache ca-certificates iptables iptables-legacy iproute2 bash openssh curl jq
+RUN apk add --no-cache ca-certificates iptables iptables-legacy iproute2 bash openssh curl jq frr
 
 RUN ln -s /usr/sbin/iptables-legacy /usr/local/bin/iptables
 RUN ln -s /usr/sbin/ip6tables-legacy /usr/local/bin/ip6tables
@@ -71,6 +71,8 @@ RUN ssh-keygen -f /etc/ssh/ssh_host_ed25519_key -N '' -t ed25519
 COPY --from=build-env /go/bin/* /usr/local/bin/
 COPY sshd_config /etc/ssh/
 COPY tailscale.sh /usr/local/bin
+
+ADD ./frr /usr/lib/frr
 
 EXPOSE 22
 CMD ["/usr/local/bin/tailscale.sh"]
