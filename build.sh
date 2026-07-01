@@ -37,10 +37,11 @@ FILENAME="tailscale-${TAILSCALE_VERSION}-${PLATFORM_COMPAT}.tar"
 
 # Determine if a cross-platform builder is required
 if [ "$PLATFORM" = "$HOST_PLATFORM" ]; then
-  BUILDER="default"
+  BUILDER_FLAG=""
 else
   BUILDER="${PLATFORM_COMPAT}-builder"
-  if ! docker buildx inspect "$BUILDER" >/dev/null 2>&1; then
+  BUILDER_FLAG="--builder ${BUILDER}"
+  if ! docker buildx inspect "${BUILDER}" >/dev/null 2>&1; then
     docker buildx create --name "${BUILDER}" --platform "${PLATFORM}" --use
   fi
 fi
@@ -87,7 +88,7 @@ docker buildx build \
   --build-arg VERSION_SHORT=$VERSION_SHORT \
   --build-arg VERSION_GIT_HASH=$VERSION_GIT_HASH \
   --platform $PLATFORM \
-  --builder $BUILDER \
+  $BUILDER_FLAG \
   --load -t ghcr.io/fluent-networks/tailscale-mikrotik:$VERSION-$TAILSCALE_VERSION .
 
 skopeo copy docker-daemon:ghcr.io/fluent-networks/tailscale-mikrotik:$VERSION-$TAILSCALE_VERSION docker-archive:"$FILENAME"
